@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 struct Posicao{
     x: u32,
     y: u32,
@@ -100,5 +101,4 @@ impl Tabuleiro {
 fn main() {
     let mut tab = Tabuleiro::tabuleiro_inicial();
     tab.imprime_tabuleiro();
-
 }
