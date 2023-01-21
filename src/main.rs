@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 struct Posicao{
     x: u32,
     y: u32,
