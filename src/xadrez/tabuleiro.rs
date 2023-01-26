@@ -92,22 +92,34 @@ impl Tabuleiro {
             println!();
         }
         println!("-----------------");
-
     }
+
+    // TODO: captura
+    pub fn valid_captura(&self) -> bool {return true}
 
     // TODO: definir as regras de movimento das outras pecas
     fn valid_moves(&self, coord_peca:(usize, usize), _coord_vai:(usize, usize)) -> bool {
 
         /* regras:
          * impede movimentar uma peca vazia
+         * se o destino da peça não for vazia aplica a captura
         */
+
         if 
             &self.mapa[coord_peca.0][coord_peca.1].representacao_visual() !=  &" "
         {
-            return true;
-        } else {
-            return false;
+            // destino já tem uma peça
+            if &self.mapa[_coord_vai.0][_coord_vai.1].representacao_visual() !=  &" " {
+                // verifica se a captura é valida
+                if self.valid_captura() {
+                    // captura a peça
+                    return true;
+                }
+            }else {
+                return true;
+            }
         }
+        return false;
     }
 
     pub fn mover(&mut self, coord_peca:(usize, usize), _coord_vai:(usize, usize)) {
