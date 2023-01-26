@@ -121,28 +121,34 @@ impl Tabuleiro {
          * se o destino da peça não for vazia aplica a captura
         */
 
-        let mut captura_mode = false;
-        // destino já tem uma peça
-        if &self.mapa[coord_vai.0][coord_vai.1].representacao_visual() !=  &" " {
-            // verifica se a captura é valida
-            if self.valid_captura() {
-                // captura a peça
-                captura_mode = true;
-            }else {
-                println!("captura inválida");
-                return false;
-            }
-        }
+        // modo captura ativado se o destino da peça ja tem alguem
+        let captura_mode = &self.mapa[coord_vai.0][coord_vai.1].representacao_visual() !=  &" ";
 
-        match &self.mapa[coord_peca.0][coord_peca.1] {
-            &Peca::Cavalo(_) => return false,
-            &Peca::Bispo(_) => return false,
-            &Peca::Torre(_) => return false,
-            &Peca::Dama(_) => return false,
-            &Peca::Rei(_) => return false,
-            &Peca::Peao(_) => return self.valid_move_peao(coord_peca, coord_vai, captura_mode),
-            &Peca::Vazio => return false,
+        let move_valid = match &self.mapa[coord_peca.0][coord_peca.1] {
+            &Peca::Cavalo(_) => false,
+            &Peca::Bispo(_) => false,
+            &Peca::Torre(_) => false,
+            &Peca::Dama(_) => false,
+            &Peca::Rei(_) => false,
+            &Peca::Peao(_) => self.valid_move_peao(coord_peca, coord_vai, captura_mode),
+            &Peca::Vazio => false,
         };
+
+        // se o movimento é valido
+        if move_valid {
+            // captura
+            if captura_mode {
+                // verifica se a captura é valida
+                if self.valid_captura() {
+                    // captura a peça
+                }else {
+                    println!("captura inválida");
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
         
     }
 
