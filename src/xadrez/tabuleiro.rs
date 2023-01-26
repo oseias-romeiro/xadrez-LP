@@ -97,6 +97,13 @@ impl Tabuleiro {
     // TODO: captura
     pub fn valid_captura(&self) -> bool {return false}
 
+    pub fn valid_move_cavalo(&self, coord_peca:(usize, usize), coord_vai:(usize, usize), captura_mode:bool) -> bool {
+        let diff_vertical = (coord_vai.0).abs_diff(coord_peca.0);
+        let diff_horizontal = (coord_vai.1).abs_diff(coord_peca.1);
+
+        return (diff_horizontal == 2) &&  (diff_vertical == 1) ||
+               (diff_horizontal == 1) && (diff_vertical == 2); 
+    }    
     // valida movimentos de um pião
     pub fn valid_move_peao(&self, coord_peca:(usize, usize), coord_vai:(usize, usize), captura_mode:bool) -> bool {
 
@@ -125,7 +132,7 @@ impl Tabuleiro {
         let captura_mode = &self.mapa[coord_vai.0][coord_vai.1].representacao_visual() !=  &" ";
 
         let move_valid = match &self.mapa[coord_peca.0][coord_peca.1] {
-            &Peca::Cavalo(_) => false,
+            &Peca::Cavalo(_) => self.valid_move_cavalo(coord_peca, coord_vai, captura_mode),
             &Peca::Bispo(_) => false,
             &Peca::Torre(_) => false,
             &Peca::Dama(_) => false,
