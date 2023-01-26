@@ -95,37 +95,61 @@ impl Tabuleiro {
     }
 
     // TODO: captura
-    pub fn valid_captura(&self) -> bool {return true}
+    pub fn valid_captura(&self) -> bool {return false}
+
+    // valida movimentos de um pião
+    pub fn valid_move_peao(&self, coord_peca:(usize, usize), coord_vai:(usize, usize), captura_mode:bool) -> bool {
+
+        // na captura o movimento pode ser de apenas uma casa na diagonal
+        if captura_mode {
+            return (coord_peca.1 == (coord_vai.1+1) || coord_peca.1 == (coord_vai.1-1)) && coord_peca.0 == (coord_vai.0+1);
+        }
+
+        // primeiro movimento de um pião pode ser de duas casas
+        if coord_peca.0 == 1 {
+            return (coord_peca.0 == (coord_vai.0-1) || coord_peca.0 == (coord_vai.0-2)) && coord_peca.1 == coord_vai.1
+        }
+        // apenas um movimento para frente é valido
+        return coord_peca.0 == (coord_vai.0-1) && coord_peca.1 == coord_vai.1
+    }
 
     // TODO: definir as regras de movimento das outras pecas
-    fn valid_moves(&self, coord_peca:(usize, usize), _coord_vai:(usize, usize)) -> bool {
+    fn valid_moves(&self, coord_peca:(usize, usize), coord_vai:(usize, usize)) -> bool {
 
         /* regras:
          * impede movimentar uma peca vazia
          * se o destino da peça não for vazia aplica a captura
         */
 
-        if 
-            &self.mapa[coord_peca.0][coord_peca.1].representacao_visual() !=  &" "
-        {
-            // destino já tem uma peça
-            if &self.mapa[_coord_vai.0][_coord_vai.1].representacao_visual() !=  &" " {
-                // verifica se a captura é valida
-                if self.valid_captura() {
-                    // captura a peça
-                    return true;
-                }
+        let mut captura_mode = false;
+        // destino já tem uma peça
+        if &self.mapa[coord_vai.0][coord_vai.1].representacao_visual() !=  &" " {
+            // verifica se a captura é valida
+            if self.valid_captura() {
+                // captura a peça
+                captura_mode = true;
             }else {
-                return true;
+                println!("captura inválida");
+                return false;
             }
         }
-        return false;
+
+        match &self.mapa[coord_peca.0][coord_peca.1] {
+            &Peca::Cavalo(_) => return false,
+            &Peca::Bispo(_) => return false,
+            &Peca::Torre(_) => return false,
+            &Peca::Dama(_) => return false,
+            &Peca::Rei(_) => return false,
+            &Peca::Peao(_) => return self.valid_move_peao(coord_peca, coord_vai, captura_mode),
+            &Peca::Vazio => return false,
+        };
+        
     }
 
-    pub fn mover(&mut self, coord_peca:(usize, usize), _coord_vai:(usize, usize)) {
+    pub fn mover(&mut self, coord_peca:(usize, usize), coord_vai:(usize, usize)) {
 
-        if self.valid_moves(coord_peca, _coord_vai) {
-            self.mapa[_coord_vai.0][_coord_vai.1] = self.mapa[coord_peca.0][coord_peca.1];
+        if self.valid_moves(coord_peca, coord_vai) {
+            self.mapa[coord_vai.0][coord_vai.1] = self.mapa[coord_peca.0][coord_peca.1];
             self.mapa[coord_peca.0][coord_peca.1] = Peca::Vazio;
         }else {
             println!("Movimento não aceito")

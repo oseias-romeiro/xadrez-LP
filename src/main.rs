@@ -8,6 +8,6 @@ fn main() {
     tab.imprime_tabuleiro();
     
     // exemplo de movimento valido
-    tab.mover((1,0),(2,0));
+    tab.mover((1,0),(3,0));
     tab.imprime_tabuleiro();
 }
