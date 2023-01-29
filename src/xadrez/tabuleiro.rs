@@ -12,8 +12,8 @@ impl Posicao {
 }
 
 
-#[derive(Debug, Clone, Copy)]
-enum Cor {
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Cor {
     Branco,
     Preto,
 }
@@ -98,19 +98,41 @@ impl Tabuleiro {
     pub fn valid_captura(&self) -> bool {return false}
 
     // valida movimentos de um pião
-    pub fn valid_move_peao(&self, coord_peca:(usize, usize), coord_vai:(usize, usize), captura_mode:bool) -> bool {
+    pub fn valid_move_peao(&self, coord_peca:(usize, usize), coord_vai:(usize, usize), captura_mode:bool, cor:Cor) -> bool {
 
-        // na captura o movimento pode ser de apenas uma casa na diagonal
+        let d_x = (coord_vai.0 as i8) - (coord_peca.0 as i8);
+        let d_y = (coord_vai.1 as i8) - (coord_peca.1 as i8);
+
+        // apenas movimentos para frente
+        if cor == Cor::Preto && d_x < 0 {
+            return false;
+        }else if cor == Cor::Branco && d_x > 0 {
+            return false;
+        }
+
+        let diff_x = i8::abs(d_x) as usize;
+        let diff_y = i8::abs(d_y) as usize;
+
+        // na captura o movimento pode ser de apenas uma casa pra frente na diagonal
         if captura_mode {
-            return (coord_peca.1 == (coord_vai.1+1) || coord_peca.1 == (coord_vai.1-1)) && coord_peca.0 == (coord_vai.0+1);
+            return diff_x == 1 && diff_y == 1;
         }
 
-        // primeiro movimento de um pião pode ser de duas casas
-        if coord_peca.0 == 1 {
-            return (coord_peca.0 == (coord_vai.0-1) || coord_peca.0 == (coord_vai.0-2)) && coord_peca.1 == coord_vai.1
+        // primeiro movimento de um pião pode ser de uma/duas casas para frente
+        if cor == Cor::Preto && coord_peca.0 == 1 || cor == Cor::Branco && coord_peca.0 == 6 {
+            return (diff_x == 1 || diff_x == 2) && diff_y == 0
         }
+
         // apenas um movimento para frente é valido
-        return coord_peca.0 == (coord_vai.0-1) && coord_peca.1 == coord_vai.1
+        return diff_x == 1 && diff_y == 0
+    }
+    // valida movimentos do rei
+    pub fn valid_move_rei(&self, coord_peca:(usize, usize), coord_vai:(usize, usize)) -> bool {
+        let diff_x = (coord_peca.0).abs_diff(coord_vai.0);
+        let diff_y = (coord_peca.1).abs_diff(coord_vai.1);
+
+        // movimento de 1 casa para qualer direcao
+        return diff_x <= 1 && diff_y <= 1;
     }
 
     // TODO: definir as regras de movimento das outras pecas
@@ -129,8 +151,9 @@ impl Tabuleiro {
             &Peca::Bispo(_) => false,
             &Peca::Torre(_) => false,
             &Peca::Dama(_) => false,
-            &Peca::Rei(_) => false,
-            &Peca::Peao(_) => self.valid_move_peao(coord_peca, coord_vai, captura_mode),
+            &Peca::Rei(_) => self.valid_move_rei(coord_peca, coord_vai),
+            &Peca::Peao(Cor::Branco) => self.valid_move_peao(coord_peca, coord_vai, captura_mode, Cor::Branco),
+            &Peca::Peao(Cor::Preto) => self.valid_move_peao(coord_peca, coord_vai, captura_mode, Cor::Preto),
             &Peca::Vazio => false,
         };
 
