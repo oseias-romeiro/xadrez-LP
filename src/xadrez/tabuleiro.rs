@@ -18,7 +18,7 @@ pub enum Cor {
     Preto,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum Peca {
     Cavalo(Cor),
     Peao(Cor),
@@ -93,9 +93,21 @@ impl Tabuleiro {
         }
         println!("-----------------");
     }
+    pub fn str_tabuleiro(&self) -> String {
+        let mut tab = "".to_string();
+        for linha in &self.mapa {
+            tab += "-----------------\n";
+            tab += "|";
+            for peca in linha {
+                tab += peca.representacao_visual();
 
-    // TODO: captura
-    pub fn valid_captura(&self) -> bool {return false}
+                tab += "|";
+            }
+            tab += "\n";
+        }
+        tab += "-----------------\n";
+        return tab;
+    }
 
     // valida movimentos de um pião
     pub fn valid_move_peao(&self, coord_peca:(usize, usize), coord_vai:(usize, usize), captura_mode:bool, cor:Cor) -> bool {
@@ -146,7 +158,7 @@ impl Tabuleiro {
         // modo captura ativado se o destino da peça ja tem alguem
         let captura_mode = &self.mapa[coord_vai.0][coord_vai.1].representacao_visual() !=  &" ";
 
-        let move_valid = match &self.mapa[coord_peca.0][coord_peca.1] {
+        return match &self.mapa[coord_peca.0][coord_peca.1] {
             &Peca::Cavalo(_) => false,
             &Peca::Bispo(_) => false,
             &Peca::Torre(_) => false,
@@ -156,33 +168,27 @@ impl Tabuleiro {
             &Peca::Peao(Cor::Preto) => self.valid_move_peao(coord_peca, coord_vai, captura_mode, Cor::Preto),
             &Peca::Vazio => false,
         };
-
-        // se o movimento é valido
-        if move_valid {
-            // captura
-            if captura_mode {
-                // verifica se a captura é valida
-                if self.valid_captura() {
-                    // captura a peça
-                }else {
-                    println!("captura inválida");
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
         
     }
 
-    pub fn mover(&mut self, coord_peca:(usize, usize), coord_vai:(usize, usize)) {
+    pub fn mover(&mut self, coord_peca:(usize, usize), coord_vai:(usize, usize)) -> bool {
 
         if self.valid_moves(coord_peca, coord_vai) {
+
+            if self.mapa[coord_vai.0][coord_vai.1] == Peca::Rei(Cor::Branco) ||
+                self.mapa[coord_vai.0][coord_vai.1] == Peca::Rei(Cor::Preto)
+            {
+                println!("Xeque mate!");
+                return false; // para o jogo
+            }
+
             self.mapa[coord_vai.0][coord_vai.1] = self.mapa[coord_peca.0][coord_peca.1];
             self.mapa[coord_peca.0][coord_peca.1] = Peca::Vazio;
+
         }else {
-            println!("Movimento não aceito")
+            println!("Movimento não aceito");
         }
+        return true;
     }
     
 }
