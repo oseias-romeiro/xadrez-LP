@@ -171,24 +171,26 @@ impl Tabuleiro {
         
     }
 
-    pub fn mover(&mut self, coord_peca:(usize, usize), coord_vai:(usize, usize)) -> bool {
+    pub fn mover(&mut self, coord_peca:(usize, usize), coord_vai:(usize, usize)) -> &str {
 
         if self.valid_moves(coord_peca, coord_vai) {
 
             if self.mapa[coord_vai.0][coord_vai.1] == Peca::Rei(Cor::Branco) ||
                 self.mapa[coord_vai.0][coord_vai.1] == Peca::Rei(Cor::Preto)
             {
-                println!("Xeque mate!");
-                return false; // para o jogo
+                return "Xeque mate!"; // para o jogo
             }
 
             self.mapa[coord_vai.0][coord_vai.1] = self.mapa[coord_peca.0][coord_peca.1];
             self.mapa[coord_peca.0][coord_peca.1] = Peca::Vazio;
 
+            return "aceito";
+
         }else {
-            println!("Movimento não aceito");
+
+            return "Movimento invalido!";
         }
-        return true;
+        
     }
     
 }
